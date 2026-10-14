@@ -44,13 +44,13 @@ class KeyHuntProblem(SearchProblem):
 
     def getStartState(self):
         """Returns the start state, a tuple (startPosition, ...)."""
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        remaining_keys = frozenset(self.keys)
+        return (self.startPosition, remaining_keys)
 
     def isGoalState(self, state):
         """True when every code piece has been collected AND Thomas is at the exit."""
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        position, remaining_keys = state
+        return position == self.exit and len(remaining_keys) == 0
 
     def getSuccessors(self, state):
         """
@@ -65,8 +65,23 @@ class KeyHuntProblem(SearchProblem):
         self._expandedOrder.append(state[0])
 
         successors = []
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        position, remaining_keys = state
+        
+        for action, next_position in self.maze.neighbors(position):
+            next_remaining_keys = remaining_keys
+            
+            # collect key if Thomas steps on one
+            if next_position in remaining_keys:
+                next_remaining_keys = remaining_keys - {next_position}
+                
+            next_state = (next_position, next_remaining_keys)
+                
+            step_cost = self.maze.cost(next_position)
+                
+            successors.append(
+                (next_state, action, step_cost)
+            )
+                
         return successors
 
     # --- Provided: you do not need to change anything below -------------
@@ -110,5 +125,47 @@ def keyHuntHeuristic(state, problem):
       * util.manhattanDistance(pos1, pos2)
     """
     position = state[0]
-    "*** YOUR CODE HERE ***"
-    return 0   # the trivial (but consistent!) heuristic
+    remaining_keys = state[1]
+    
+    ## All places that still have to be visited: remaining_keys + the exit
+    targets = set(remaining_keys)
+    targets.add(problem.exit)
+    
+    # distance from thomas to nearesr target
+    nearest_distance = min(
+        mazeDistance(position, target, problem.maze, problem.heuristicInfo)
+        for target in targets
+    )
+    
+    # use te set of tagets as a cache key
+    target_set = frozenset(targets)
+    cache_key = ("keyHuntMST", target_set)
+    
+    if cache_key in problem.heuristicInfo:
+        mst_cost = problem.heuristicInfo[cache_key]
+    else:
+        # Prims algo for Minimum Spanning Tree
+        unvisited = set(targets)
+        first = unvisited.pop()
+        connected = {first}
+        
+        mst_cost = 0
+        while unvisited:
+            best_distance = float('inf')
+            best_target = None
+            
+            for connected_target in connected:
+                for unvisited_target in unvisited:
+                    distance = mazeDistance(connected_target, unvisited_target, problem.maze, problem.heuristicInfo)
+                    
+                    if distance < best_distance:
+                        best_distance = distance
+                        best_target = unvisited_target
+            
+            mst_cost += best_distance
+            connected.add(best_target)
+            unvisited.remove(best_target)
+        
+        problem.heuristicInfo[cache_key] = mst_cost
+    return nearest_distance + mst_cost
+    # return 0   # the trivial (but consistent!) heuristic
