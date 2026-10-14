@@ -6,16 +6,9 @@ from heuristics import nullHeuristic
 
 
 # ----------------------------------------------------------------------
-# Q0 (worked example, not graded): always go right
+#                        Graph Search Problems
 # ----------------------------------------------------------------------
 def alwaysRightSearch(problem):
-    """
-    Not a real search: the runner keeps stepping right ('East') until he
-    reaches the goal. If a wall blocks the way east, he is stuck and gives up
-    (returns None). It shows you how to use the problem's methods. Try it:
-        python runner.py -l maze_tiny -a right     (escapes)
-        python runner.py -l maze_small -a right       (walks into a wall)
-    """
     state = problem.getStartState()
     actions = []
     while not problem.isGoalState(state):
@@ -39,63 +32,83 @@ def depthFirstSearch(problem):
     explored = set()
     while not st.isEmpty():
         state, actions = st.pop()
-        if problem.isGoalState(state):
+        if problem.isGoalState(state): # check wether the current state is the goal state or not yk we reach goal then return the actions we took to reach the goal state 
             return actions
-        if state in explored:
+        if state in explored: # Distinction between Graphs and Trees. Reason : Because of cyscle.
             continue
         if state not in explored:
             explored.add(state)
             for successor, action, _ in problem.getSuccessors(state):
+                 # get the successors of the current state and push them to the stack if they are not already explored abdullah and also here unpacking is happening like successor is the next state, action is the action to reach that state and _ is the cost of reaching that state which we are not using here we will use it in uniform cost search and a* search
                 if successor not in explored:
                     st.push((successor, actions + [action]))
     return None 
 
 
 # ----------------------------------------------------------------------
-# Q2: Breadth-First Search
+#                         Breadth-First Search
 # ----------------------------------------------------------------------
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first (graph search)."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    q = Queue()
+    start = problem.getStartState()
+    q.push((start, [])) #push the intial state and empty action list to the queue
+    explored = set()
+    while not q.isEmpty():
+        state, actions = q.pop()
+        if problem.isGoalState(state):
+            return actions
+        if state in explored:
+            continue
+        if state not in explored:
+            explored.add(state)
+            for  nextState , action, _ in problem.getSuccessors(state):
+                if nextState not in explored:
+                    q.push((nextState, actions + [action]))
+
+        
 
 
 # ----------------------------------------------------------------------
 # Q3: Depth-Limited Search
 # ----------------------------------------------------------------------
 def depthLimitedSearch(problem, limit):
-    """
-    Depth-first search that never goes deeper than 'limit' actions.
+    cutoffOccurred = False
 
-    Return value:
-      * a list of at most 'limit' actions that reaches a goal, or
-      * CUTOFF (from util) if no goal was found but the search was stopped
-        by the depth limit somewhere, so a deeper solution may exist, or
-      * None if no goal was found and the limit was never reached, which
-        proves there is no solution at all.
+    def recurse(state, pathStates, depth):
+        nonlocal cutoffOccurred  # Basically abdullah this is used to access the variable cutoffOccurred which is defined in the outer function depthLimitedSearch and we are using it in the inner function recurse so we need to use nonlocal keyword to access it otherwise it will give an error that cutoffOccurred is not defined in the inner function recurse or like it will look for current scope and it will not find it so it will give an error so we need to use nonlocal keyword to access the variable which is defined in the outer function depthLimitedSearch and we are using it in the inner function recurse
 
-    The start state is at depth 0. A state at depth == limit may be goal
-    tested but must not be expanded.
+        if problem.isGoalState(state):
+            return []
 
-    Do NOT use a global explored set here (think about why that can make the
-    search miss a solution that fits within the limit). Instead, avoid cycles
-    by not revisiting a state that is already on the current path.
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+        if depth == limit:
+            cutoffOccurred = True
+            return None
+
+        for successor, action, _ in problem.getSuccessors(state):
+            if successor in pathStates:   # would loop back on this route
+                continue
+            result = recurse(successor, pathStates | {successor}, depth + 1)
+            if result is not None:
+                return [action] + result   # a goal was found below us
+
+        return None
+
+    start = problem.getStartState()
+    result = recurse(start, {start}, 0)
+    if result is not None:
+        return result
+    return CUTOFF if cutoffOccurred else None
 
 
 # ----------------------------------------------------------------------
 # Q4: Iterative Deepening Search
 # ----------------------------------------------------------------------
 def iterativeDeepeningSearch(problem, maxDepth=10000):
-    """
-    Run depthLimitedSearch with limit = 0, 1, 2, ... until it finds a
-    solution. Return that solution, or None if the problem has no solution
-    (or none within maxDepth).
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    for depth in range(maxDepth):
+        result = depthLimitedSearch(problem, depth)
+        if result != CUTOFF:
+            return result
+    return None
 
 
 # ----------------------------------------------------------------------
