@@ -23,13 +23,21 @@ def manhattanHeuristic(state, problem):
     Q6: the Manhattan distance from 'state' to problem.goal:
         |row1 - row2| + |col1 - col2|
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    goal = problem.goal
+    
+    row_difference = abs(state[0] - goal[0])
+    col_difference = abs(state[1] - goal[1])
+    
+    return row_difference + col_difference
 
 
 def euclideanHeuristic(state, problem):
     """
     Q6: the straight-line (Euclidean) distance from 'state' to problem.goal.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    goal = problem.goal
+    
+    row_difference = state[0] - goal[0]
+    col_difference = state[1] - goal[1]
+    
+    return math.sqrt( row_difference ** 2 + col_difference ** 2)
