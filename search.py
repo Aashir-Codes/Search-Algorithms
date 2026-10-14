@@ -140,9 +140,37 @@ def greedyBestFirstSearch(problem, heuristic=nullHeuristic):
     Search the node that SEEMS closest to the goal first, i.e. the one with
     the lowest heuristic(state, problem) value (graph search).
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    priority_queue = PriorityQueue()
+    explored = set()
+    start_state = problem.getStartState()
+    
+    priority_queue.push(
+        (start_state, []), heuristic(start_state, problem)
+        )
+    
+    while not priority_queue.isEmpty():
+        current_state, actions = priority_queue.pop()
+        
+        # goal test when state is popped
+        if problem.isGoalState(current_state):
+            return actions
+        
+        # not expanding a state twice
+        if current_state in explored:
+            continue
+        
+        explored.add(current_state)
+        
+        #expand state
+        for next_state, action, step_cost in problem.getSuccessors(current_state):
+            if next_state not in explored:
+                next_h = heuristic(next_state, problem)
+                priority_queue.push(
+                    (next_state, actions + [action]), next_h
+                 )
+                
+    return None
+    
 
 # ----------------------------------------------------------------------
 # Q7: A* Search
