@@ -1,5 +1,3 @@
-from inspect import stack
-
 import util
 from util import Stack, Queue, PriorityQueue, CUTOFF
 from heuristics import nullHeuristic
@@ -39,7 +37,10 @@ def depthFirstSearch(problem):
         if state not in explored:
             explored.add(state)
             for successor, action, _ in problem.getSuccessors(state):
-                 # get the successors of the current state and push them to the stack if they are not already explored abdullah and also here unpacking is happening like successor is the next state, action is the action to reach that state and _ is the cost of reaching that state which we are not using here we will use it in uniform cost search and a* search
+                 # get the successors of the current state and push them to the stack if they are not already explored
+                 # and also here unpacking is happening like successor is the next state,
+                 # action is the action to reach that state 
+                 # and _ is the cost of reaching that state which we are not using here we will use it in uniform cost search and a* search
                 if successor not in explored:
                     st.push((successor, actions + [action]))
     return None 
@@ -64,6 +65,8 @@ def breadthFirstSearch(problem):
             for  nextState , action, _ in problem.getSuccessors(state):
                 if nextState not in explored:
                     q.push((nextState, actions + [action]))
+                    
+    return None
 
         
 
@@ -75,7 +78,11 @@ def depthLimitedSearch(problem, limit):
     cutoffOccurred = False
 
     def recurse(state, pathStates, depth):
-        nonlocal cutoffOccurred  # Basically abdullah this is used to access the variable cutoffOccurred which is defined in the outer function depthLimitedSearch and we are using it in the inner function recurse so we need to use nonlocal keyword to access it otherwise it will give an error that cutoffOccurred is not defined in the inner function recurse or like it will look for current scope and it will not find it so it will give an error so we need to use nonlocal keyword to access the variable which is defined in the outer function depthLimitedSearch and we are using it in the inner function recurse
+        nonlocal cutoffOccurred  # Basically this is used to access the variable cutoffOccurred which is defined in the outer function depthLimitedSearch 
+        # and we are using it in the inner function recurse so we need to use nonlocal keyword to access it 
+        # otherwise it will give an error that cutoffOccurred is not defined in the inner function recurse or like it will look for current scope 
+        # and it will not find it so it will give an error so we need to use nonlocal keyword to access the variable 
+        # which is defined in the outer function depthLimitedSearch and we are using it in the inner function recurse
 
         if problem.isGoalState(state):
             return []
@@ -106,7 +113,7 @@ def depthLimitedSearch(problem, limit):
 def iterativeDeepeningSearch(problem, maxDepth=10000):
     for depth in range(maxDepth):
         result = depthLimitedSearch(problem, depth)
-        if result != CUTOFF:
+        if result is not CUTOFF:
             return result
     return None
 
