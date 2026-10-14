@@ -1,28 +1,3 @@
-"""
-search.py
----------
-THE MAZE RUNNER — Mini Project 1: Classical Search
-
-This is where you implement the search algorithms (Questions 1–7).
-
-Every algorithm receives a SearchProblem (see problems.py) and must retu    rn a
-LIST OF ACTIONS that leads from the start state to a goal state, e.g.
-['South', 'South', 'East']. Return [] if the start state is already a goal.
-
-Conventions the grader relies on (please read — they matter!):
-
-  * Use the fringe containers from util.py (Stack, Queue, PriorityQueue).
-  * Calling problem.getSuccessors(state) counts as EXPANDING that state.
-    Call it exactly once per expanded state, and never for a state you only
-    generated.
-  * Goal test when a state is POPPED from the fringe (just before you would
-    expand it), not when it is pushed. (For BFS the grader also accepts
-    the "early" goal test done when a state is generated.)
-  * Push successors in the order getSuccessors returns them.
-  * Q1, Q2, Q5, Q6, Q7 are GRAPH searches: keep a set of already-expanded
-    states and never expand the same state twice.
-"""
-
 from inspect import stack
 
 import util
